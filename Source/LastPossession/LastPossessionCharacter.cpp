@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "LastPossession.h"
+#include "IsPossessable.h"
 
 ALastPossessionCharacter::ALastPossessionCharacter()
 {
@@ -61,7 +62,7 @@ void ALastPossessionCharacter::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ALastPossessionCharacter::LookInput);
 
 		//Firing
-		EnhancedInputComponent->BindAction(FiringAction, ETriggerEvent::Triggered, this, &ALastPossessionCharacter::Firing);
+		EnhancedInputComponent->BindAction(FiringAction, ETriggerEvent::Started, this, &ALastPossessionCharacter::Firing);
 	}
 	else
 	{
@@ -132,6 +133,32 @@ void ALastPossessionCharacter::Firing()
 	FVector TraceEnd = FirstPersonCameraComponent->GetForwardVector() * 1000.0f + FirstPersonCameraComponent->GetComponentLocation();
 	FVector TraceStart = FirstPersonCameraComponent->GetComponentLocation();
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, TraceChannelProperty, QueryParams);
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, Hit.bBlockingHit ? FColor::Blue : FColor::Red, false, 5.0f, 0, 10.0f);
+
+
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, Hit.bBlockingHit ? FColor::Blue : FColor::Red, false, 5.0f, 0, 5.0f);
 	UE_LOG(LogTemp, Log, TEXT("Tracing line: %s to %s"), *TraceStart.ToCompactString(), *TraceEnd.ToCompactString());
+
+	if(Hit.bBlockingHit)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Hit Actor: %s"), *GetNameSafe(Hit.GetActor()));
+		
+			IIsPossessable* PossessableActor = Cast<IIsPossessable>(Hit.GetActor());
+			if(PossessableActor)
+			{
+				PossessableActor->Execute_TakingDamageFromHit(Hit.GetActor(),true,this, 10.0f, Hit);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor is not possessable."));
+			}
+	}
+
+}
+
+void ALastPossessionCharacter::TakingDamageFromHit_Implementation(	bool bIsPlayer, AActor* DamagingActor, float DamageAmount, FHitResult HitInfo)
+{
+	UE_LOG(LogTemp, Log, TEXT("Possessed Character took damage from hit!"));
+	
+	GetWorld()->GetFirstPlayerController()->Possess(this);
+	
 }

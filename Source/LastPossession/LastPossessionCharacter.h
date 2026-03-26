@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "IsPossessable.h"
 #include "LastPossessionCharacter.generated.h"
-
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -19,7 +19,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  A basic first person character
  */
 UCLASS(abstract)
-class ALastPossessionCharacter : public ACharacter
+class ALastPossessionCharacter : public ACharacter, public IIsPossessable
 {
 	GENERATED_BODY()
 
@@ -49,9 +49,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
 
-	/** Mouse Look Input Action */
+	/** Mouse Firing Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")
-	class UInputAction* FiringAction;
+	UInputAction* FiringAction;
+
+	UPROPERTY(EditAnywhere, Category="Collision")
+	TEnumAsByte<ECollisionChannel> TraceChannelProperty = ECC_Pawn;
+	
 	
 public:
 	ALastPossessionCharacter();
@@ -82,9 +86,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void Firing();
+	
 
-	UPROPERTY(EditAnywhere, Category = "Collision")
-	TEnumAsByte<ECollisionChannel> TraceChannelProperty = ECC_Pawn;
+	virtual void TakingDamageFromHit_Implementation(bool bIsFromPlayer, AActor* DamagingActor, float DamageAmount, FHitResult HitInfo) override;
 
 
 protected:
