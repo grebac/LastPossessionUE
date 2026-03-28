@@ -54,4 +54,6 @@ protected:
 
 	/** Returns true if the player should use UMG touch controls */
 	bool ShouldUseTouchControls() const;
+
+	
 };

@@ -39,6 +39,7 @@ void ALastPossessionPlayerController::BeginPlay()
 		}
 
 	}
+	
 }
 
 void ALastPossessionPlayerController::SetupInputComponent()

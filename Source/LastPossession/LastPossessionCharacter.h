@@ -56,6 +56,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Collision")
 	TEnumAsByte<ECollisionChannel> TraceChannelProperty = ECC_Pawn;
 	
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundWave* PickedSound;
+	
 	
 public:
 	ALastPossessionCharacter();

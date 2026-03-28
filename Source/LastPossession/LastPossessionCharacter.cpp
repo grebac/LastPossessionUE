@@ -10,7 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "LastPossession.h"
 #include "IsPossessable.h"
-
+#include "Kismet/GameplayStatics.h"
 ALastPossessionCharacter::ALastPossessionCharacter()
 {
 	// Set size for collision capsule
@@ -140,6 +140,7 @@ void ALastPossessionCharacter::Firing()
 
 	if(Hit.bBlockingHit)
 	{
+		
 		UE_LOG(LogTemp, Log, TEXT("Hit Actor: %s"), *GetNameSafe(Hit.GetActor()));
 		
 			IIsPossessable* PossessableActor = Cast<IIsPossessable>(Hit.GetActor());
@@ -151,6 +152,11 @@ void ALastPossessionCharacter::Firing()
 			{
 				UE_LOG(LogTemp, Log, TEXT("Hit Actor is not possessable."));
 			}
+	}
+	else
+	{
+		UGameplayStatics::PlaySound2D(this,PickedSound);
+		UE_LOG(LogTemp, Log, TEXT("No hit detected."));	
 	}
 
 }
